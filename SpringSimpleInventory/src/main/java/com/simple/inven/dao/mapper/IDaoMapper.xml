@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.simple.inven.dao.IDao">
+
+	<!-- 계정 목록을 가져옴 -->
+	<resultMap id="accountResultMap" type="com.simple.inven.dto.AccountDto">
+		<result property="u_id" column="u_id"/>
+		<result property="userId" column="user_id"/>
+		<result property="userPass" column="user_pass"/>
+		<result property="money" column="money"/>
+	</resultMap>
+
+	<select id="accounts" resultMap="accountResultMap">
+		  SELECT u_id
+		  	   , user_id
+			   , user_pass
+			   , money
+			FROM zt_account
+    </select>
+    
+    <!-- 특정 계정 정보를 가져옴 -->
+    <select id="getAccount" resultMap="accountResultMap">
+		  SELECT u_id
+		  	   , user_id
+			   , user_pass
+			   , money
+			FROM zt_account
+	       WHERE u_id = #{user_uid}
+    </select>
+    
+    <!-- 회원가입 - 가입한 유저의 UID를 AccountDto에 세팅해줌 -->
+    <insert id="register" parameterType="com.simple.inven.dto.AccountDto"  useGeneratedKeys="true">
+    	<selectKey keyProperty="u_id" resultType="int" order="BEFORE">
+ 			select zt_account_seq.nextval FROM DUAL
+		</selectKey>		 
+		
+	   INSERT INTO zt_account (u_id, user_id, user_pass, money) 
+		    VALUES (#{u_id}, #{userId}, #{userPass}, 100000)
+        
+      <!-- 
+       Oracle은 curval이란게 없음 ㄷㄷ 
+	  INSERT INTO zt_account (u_id, user_id, user_pass) 
+     	   VALUES (zt_account_seq.nextval, #{userId}, #{userPass})
+     	   
+   	   <selectKey keyProperty="u_id" resultType="int" order="AFTER">
+ 			select zt_account_seq.curval FROM DUAL
+		</selectKey>
+		 -->
+    </insert>
+    
+    <insert id="createInventory">
+		   INSERT INTO zt_inventory (u_id, user_uid, inven_name)  
+		        VALUES (zt_inventory_seq.nextval, #{param1}, #{param2})
+    </insert>
+    
+    <!-- 인벤토리 정보 -->
+    <resultMap id="invenResultMap" type="com.simple.inven.dto.InvenDto">
+    	<result property="u_id" column="u_id"/>
+    	<result property="user_uid" column="user_uid"/>
+    	<result property="invenName" column="inven_name"/>
+    	<result property="curSize" column="cur_size"/>
+    	<result property="maxSize" column="max_size"/>
+    </resultMap>
+    
+    <select id="getInventory" resultMap="invenResultMap">
+    	SELECT u_id, 
+    	       user_uid, 
+    	       inven_name, 
+    	       cur_size, 
+    	       max_size 
+		  FROM zt_inventory 
+         WHERE user_uid = #{user_uid}
+    </select>
+    
+    <!-- 인벤토리 아이템 목록 -->
+    <resultMap id="invenItemResultMap" type="com.simple.inven.dto.InvenItemDto">
+    	<result property="u_id" column="u_id"/>
+		<result property="quantity" column="quantity"/>
+		
+		<!--
+			@참고 : https://goodteacher.tistory.com/248
+			property : InvenItemDto의 멤버변수 명
+			column : 조인관계에 사용되는 컬럼 이름
+			javaType : 연동될 객체 타입
+		 -->
+		<association property="itemInfo" column="u_id" javaType="com.simple.inven.dto.ItemDto" columnPrefix="item_" >
+			<result property="u_id" column="u_id"/>
+			<result property="itemName" column="item_name"/>
+			<result property="itemType" column="item_type"/>
+			<result property="buyPrice" column="buy_price"/>
+			<result property="sellPrice" column="sell_price"/>
+			<result property="maxQuantity" column="max_quantity"/>
+		</association>
+	</resultMap>
+    
+    <select id="listInvenItems" resultMap="invenItemResultMap">
+    	SELECT inven_item.u_id as u_id,
+		       item.u_id as item_u_id,
+		       item.item_name as item_item_name,
+		       item.item_type as item_item_type,
+		       item.buy_price as item_buy_price,
+		       item.sell_price as item_sell_price,
+		       inven_item.quantity as quantity,
+		       item.max_quantity as item_max_quantity
+		  FROM zt_inventory_item inven_item
+		  JOIN zt_item item ON inven_item.item_uid = item.u_id
+		 WHERE inven_item.inven_uid = #{param1}
+    </select>
+    
+    <!-- 상점 아이템 목록 -->
+    <resultMap id="shopItemResultMap" type="com.simple.inven.dto.ItemDto">
+		<result property="u_id" column="u_id"/>
+		<result property="itemName" column="item_name"/>
+		<result property="itemType" column="item_type"/>
+		<result property="buyPrice" column="buy_price"/>
+		<result property="sellPrice" column="sell_price"/>
+		<result property="maxQuantity" column="max_quantity"/>
+	</resultMap>
+	
+	<select id="listShopItems" resultMap="shopItemResultMap">
+		SELECT u_id,
+			   item_name,
+			   item_type,
+			   buy_price,
+			   sell_price,
+			   max_quantity
+		  FROM zt_item
+	</select>
+	
+	<!-- 특정 상점 아이템 정보 -->
+	<select id="getShopItem" resultMap="shopItemResultMap">
+		SELECT u_id,
+			   item_name,
+			   item_type,
+			   buy_price,
+			   sell_price,
+			   max_quantity
+		  FROM zt_item
+		 WHERE u_id = #{item_uid}
+	</select>
+	
+	<!-- 인벤토리에 아이템 추가 -->
+	<insert id="insertInvenItem">
+		INSERT INTO zt_inventory_item (
+			       u_id,
+			       inven_uid,
+			       item_uid,
+			       quantity
+			   )
+		VALUES (
+				   zt_inventory_item_seq.nextval,
+				   #{param2},
+				   #{param1},
+				   #{param3}
+			   )
+	</insert>
+	
+	<!-- 인벤토리에 아이템 수량 변경 -->
+	<insert id="updateInvenItem">
+		UPDATE zt_inventory_item
+		   SET quantity = #{param2}
+		 WHERE u_id = #{param1}
+	</insert>
+	
+	<!-- 인벤토리에 아이템 삭제 -->
+	<delete id="deleteInvenItem">
+		DELETE zt_inventory_item
+		 WHERE u_id = #{u_id}
+	</delete>
+	
+	<!-- 유저 소지금액 업데이트 -->
+	<update id="updateMoney">
+		UPDATE zt_account
+		   SET money = #{param2}
+ 		 WHERE u_id = #{param1}
+	</update>
+	
+	<!-- 유저 인벤토리 아이템 얻기 -->
+ 	<select id="getInvenItem" resultMap="invenItemResultMap">
+    	SELECT inven_item.u_id as u_id,
+		       item.u_id as item_u_id,
+		       item.item_name as item_item_name,
+		       item.item_type as item_item_type,
+		       item.buy_price as item_buy_price,
+		       item.sell_price as item_sell_price,
+		       inven_item.quantity as quantity,
+		       item.max_quantity as item_max_quantity
+		  FROM zt_inventory_item inven_item
+		  JOIN zt_item item ON inven_item.item_uid = item.u_id
+		 WHERE inven_item.u_id = #{param1}
+    </select>
+	
+</mapper>

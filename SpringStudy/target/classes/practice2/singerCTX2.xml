@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="singer3" class="com.jdyun.practice2.Singer">
+		<constructor-arg name="name" value="블랙핑크"></constructor-arg>
+		<property name="memberCount" value="4"></property>
+		
+		<property name="sings">
+			<list>
+				<value>아이스크림</value>
+				<value>하우 유</value>
+				<value>러아쿠 댓</value>
+			</list>
+		</property>
+	</bean>
+	
+	
+</beans>

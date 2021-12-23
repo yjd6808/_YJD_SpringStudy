@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+	
+	<bean id="logAop" class="com.jdyun.example11_aop_xml.LogAop"></bean>
+	
+	<aop:config>
+		<aop:aspect id="logger" ref="logAop">
+		
+			
+			<!-- 적용 범위 -->
+			<aop:pointcut expression="within(com.jdyun.example11_aop_xml.*)" id="publicM"/>
+			
+			<!-- 
+				적용할 핵심함수
+				around : 	
+			-->
+			<aop:around method="loggerAop" pointcut-ref="publicM"/>
+		</aop:aspect>
+	</aop:config>
+
+	<bean id="student" class="com.jdyun.example11_aop_xml.Student">
+		<property name="name" value="홍길동"></property>
+		<property name="age" value="10"></property>
+		<property name="gradeNum" value="3"></property>
+		<property name="classNum" value="5"></property>
+	</bean>
+	
+	<bean id="worker" class="com.jdyun.example11_aop_xml.Worker">
+		<property name="name" value="홍길중"></property>
+		<property name="age" value="35"></property>
+		<property name="job" value="개발자"></property>
+	</bean>
+</beans>

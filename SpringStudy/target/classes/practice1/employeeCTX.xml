@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="employee1" class="com.jdyun.practice1.Employee">
+		<constructor-arg name="name" value="임영웅"></constructor-arg>
+		<property name="pay" value="300"></property>
+		<property name="cards">
+			<list>
+				<value>정보처리기사</value>
+				<value>sqlD</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="employeeInfo1" class="com.jdyun.practice1.EmployeeInfo">
+		<property name="employee">
+			<ref bean="employee1"/>
+		</property>
+	</bean>
+	
+</beans>

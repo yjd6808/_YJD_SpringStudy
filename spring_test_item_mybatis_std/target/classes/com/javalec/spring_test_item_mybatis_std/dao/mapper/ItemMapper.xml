@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="com.javalec.spring_test_item_mybatis_std.dao.ItemDao">
+	<select id="list" resultType="com.simple.inven.dto.AccountDto">
+		  SELECT NAME
+			   , PRICE
+			   , DESCRIPTION
+			FROM MVC_ITEM
+    </select>
+    
+    <insert id="write">    
+		   INSERT INTO MVC_ITEM(name,price,description) VALUES (#{param1},#{param2},#{param3})
+    </insert>
+</mapper>
